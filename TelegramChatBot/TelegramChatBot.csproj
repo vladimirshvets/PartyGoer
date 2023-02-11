@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ChatBot\ChatBot.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Telegram.Bot" />
+    <None Remove="System.Configuration.ConfigurationManager" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Telegram.Bot" Version="18.0.0" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+  </ItemGroup>
+</Project>

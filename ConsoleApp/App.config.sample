@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+    <configSections>
+        <sectionGroup name="telegramBotSettings">
+            <section name="general" type="System.Configuration.NameValueSectionHandler" />
+            <sectionGroup name="stickers">
+                <section name="hello" type="System.Configuration.NameValueSectionHandler" />
+                <section name="beer" type="System.Configuration.NameValueSectionHandler" />
+                <section name="food" type="System.Configuration.NameValueSectionHandler" />
+            </sectionGroup>
+        </sectionGroup>
+    </configSections>
+
+    <appSettings>
+    </appSettings>
+
+    <telegramBotSettings>
+        <general>
+            <add key="accessToken" value="" />
+        </general>
+        <stickers>
+            <hello>
+                <add key="insideLapenko_helloFather" value="CAACAgIAAxkBAAMFY-Dqm8C2VmFaxu4b8rRFg2BFFqEAAjwAA6ZuqR1wRgTKK5mM7S4E" />
+            </hello>
+            <beer>
+                <add key="ShkyaPack_beer" value="CAACAgIAAxkBAAMWY-D8D2MjVKb_YCe73CbQELsoAATXAAOEZQcKlTvTpIY9AiYuBA" />
+            </beer>
+            <food>
+                <add key="Kabanch_kogdaObed" value="CAACAgIAAxkBAAP0Y-EVYRzSUUfThzanCJfw7jIinRMAArsAA1dPFQhqWqTuI6NdDC4E" />
+            </food>
+        </stickers>
+    </telegramBotSettings>
+</configuration>
