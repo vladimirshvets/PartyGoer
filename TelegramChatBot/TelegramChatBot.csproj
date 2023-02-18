@@ -8,13 +8,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ChatBot\ChatBot.csproj" />
+    <ProjectReference Include="..\Infotainment\Infotainment.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Telegram.Bot" />
     <None Remove="System.Configuration.ConfigurationManager" />
+    <None Remove="NLog" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Telegram.Bot" Version="18.0.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+    <PackageReference Include="NLog" Version="5.1.2" />
   </ItemGroup>
 </Project>

@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Specialized;
+﻿using System.Collections.Specialized;
 using System.Configuration;
 using System.Text.RegularExpressions;
+using NLog;
+using PartyGoer.Infotainment;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -16,8 +17,15 @@ public class TelegramMessageProcessor
 
     private NameValueCollection _foodStickers;
 
+    /// <summary>
+    /// Instance of logger.
+    /// </summary>
+    private Logger _logger;
+
     public TelegramMessageProcessor()
     {
+        _logger = LogManager.GetCurrentClassLogger();
+
         // Set stickers.
         // ToDo:
         // Remove ConfigurationManager package.
@@ -59,7 +67,11 @@ public class TelegramMessageProcessor
 
         if (message.Type == MessageType.Sticker)
         {
-            Console.WriteLine($"Received a sticker {message.Sticker.SetName} " +
+            _logger.Debug($"Chat {chatId} " +
+                $"From {message.From.Id} {message.From.Username} " +
+                $"/ {message.From.FirstName} {message.From.LastName} " +
+                $"| Message Id: {message.MessageId}" +
+                $"| Received sticker: {message.Sticker.SetName}, " +
                 $"fileId = {message.Sticker.FileId}");
         }
 
@@ -69,7 +81,63 @@ public class TelegramMessageProcessor
             return false;
         }
 
-        Console.WriteLine($"Chat {chatId} | Received: {messageText}");
+        _logger.Debug($"Chat {chatId} " +
+            $"From {message.From.Id} {message.From.Username} " +
+            $"/ {message.From.FirstName} {message.From.LastName} " +
+            $"| Message Id: {message.MessageId}" +
+            $"| Received: {messageText}");
+
+        Random random = new Random();
+        if (messageText == "/healthcheck" || messageText.ToLower().Contains("привет"))
+        {
+            await botClient.SendStickerAsync(
+                    chatId: chatId,
+                    sticker: _helloStickers.Get(random.Next(_helloStickers.Count)),
+                    cancellationToken: cancellationToken);
+        }
+        else if (Regex.IsMatch(messageText, @"^/birthday(\s([A_Za_zА_Яа_я]{1,}))?"))
+        {
+            string cgn = 
+                BirthdayService.GetCongratulation(messageText.Substring(9));
+            await botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: cgn,
+                cancellationToken: cancellationToken);
+        }
+        else if (messageText == "/beer")
+        {
+            await botClient.SendStickerAsync(
+                    chatId: chatId,
+                    sticker: _beerStickers.Get(random.Next(_beerStickers.Count)),
+                    cancellationToken: cancellationToken);
+        }
+        else if (messageText == "/kazantip")
+        {
+            await botClient.SendPhotoAsync(
+                    chatId: chatId,
+                    photo: "https://images.glavred.info/2017_01/thumb_files/1200x0/1483352484-27546162.jpg",
+                    caption: "Ты чё, мужик? Подожди месяцок",
+                    parseMode: ParseMode.Html,
+                    cancellationToken: cancellationToken);
+        }
+        else if (messageText == "/events")
+        {
+            string events = await CalendarEventService.GetTodaysEventsAsync();
+            await botClient.SendTextMessageAsync(
+                chatId: chatId,
+                text: events,
+                cancellationToken: cancellationToken);
+        }
+        else
+        {
+            if (random.Next(100) < 5)
+            {
+                await botClient.SendTextMessageAsync(
+                    chatId: chatId,
+                    text: "Хватит постить кринж!)",
+                    cancellationToken: cancellationToken);
+            }
+        }
 
         return true;
     }

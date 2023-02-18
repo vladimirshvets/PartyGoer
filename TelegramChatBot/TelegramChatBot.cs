@@ -1,4 +1,5 @@
-﻿using PartyGoer.ChatBot;
+﻿using NLog;
+using PartyGoer.ChatBot;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -30,6 +31,11 @@ public class TelegramChatBot : IChatBot
     private TelegramMessageProcessor _messageProcessor;
 
     /// <summary>
+    /// Instance of logger.
+    /// </summary>
+    private Logger _logger;
+
+    /// <summary>
     /// Bot constructor.
     /// </summary>
     /// <param name="accessToken">Bot access token.</param>
@@ -43,13 +49,44 @@ public class TelegramChatBot : IChatBot
             AllowedUpdates = Array.Empty<UpdateType>()
         };
         _messageProcessor = new TelegramMessageProcessor();
+
+        _logger = LogManager.GetCurrentClassLogger();
     }
 
-    public async Task<bool> TestConnection()
+    public async Task TestConnectionAsync(CancellationTokenSource cts)
     {
         var me = await _client.GetMeAsync();
-        Console.WriteLine($"Test: User {me.Id}, name is {me.FirstName}.");
-        return true;
+        _logger.Debug($"Test: User {me.Id}, name is {me.FirstName}.");
+    }
+
+    public async Task SendTextMessageAsync(
+        long chatId,
+        string messageText,
+        bool disableNotification,
+        int? replyToMessageId,
+        CancellationTokenSource cts)
+    {
+        await _client.SendTextMessageAsync(
+            chatId: chatId,
+            text: messageText,
+            disableNotification: disableNotification,
+            replyToMessageId: replyToMessageId,
+            cancellationToken: cts.Token);
+    }
+
+    public async Task SendStickerAsync(
+        long chatId,
+        string stickerFileId,
+        bool disableNotification,
+        int? replyToMessageId,
+        CancellationTokenSource cts)
+    {
+        await _client.SendStickerAsync(
+            chatId: chatId,
+            sticker: stickerFileId,
+            disableNotification: disableNotification,
+            replyToMessageId: replyToMessageId,
+            cancellationToken: cts.Token);
     }
 
     public void StartBot(CancellationTokenSource cts)
@@ -64,7 +101,7 @@ public class TelegramChatBot : IChatBot
         );
 
         var me = _client.GetMeAsync();
-        Console.WriteLine($"Start listening for @{me.Result.Username}");
+        _logger.Debug($"Start listening for @{me.Result.Username}");
     }
 
     public void StopBot(CancellationTokenSource cts)
@@ -105,11 +142,11 @@ public class TelegramChatBot : IChatBot
         {
             ApiRequestException apiRequestException
                 => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n" +
-                $"{apiRequestException.Message}",
+                   $"{apiRequestException.Message}",
             _ => exception.ToString()
         };
 
-        Console.WriteLine(errorMessage);
+        _logger.Debug(errorMessage);
         return Task.CompletedTask;
     }
 }
