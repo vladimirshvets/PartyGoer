@@ -5,9 +5,9 @@ using PartyGoer.ChatBot;
 using ConsoleApp;
 using NLog;
 
-LogManager.LoadConfiguration("..//..//..//nlog.config");
+LogManager.LoadConfiguration("..//..//..//nlog_console.config");
 Logger logger = LogManager.GetCurrentClassLogger();
-logger.Debug($"Starting up");
+logger.Debug($"Starting up the console application");
 
 // Read settings from config file.
 NameValueCollection tgBotGeneralSettings =

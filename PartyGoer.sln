@@ -14,8 +14,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2D74E41E-893C-4B75-BA12-BE281AF5DC59}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
-		ConsoleApp\bin\Debug\net7.0\execution.log = ConsoleApp\bin\Debug\net7.0\execution.log
+		WebInterface\bin\Debug\net7.0\execution_web.log = WebInterface\bin\Debug\net7.0\execution_web.log
+		ConsoleApp\bin\Debug\net7.0\execution_console.log = ConsoleApp\bin\Debug\net7.0\execution_console.log
+		.gitignore = .gitignore
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebInterface", "WebInterface\WebInterface.csproj", "{E97E4991-0DF3-471E-A4B9-DC3337D366ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,10 @@ Global
 		{CBF236DE-E8AF-4225-AE95-D679902432C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBF236DE-E8AF-4225-AE95-D679902432C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBF236DE-E8AF-4225-AE95-D679902432C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E97E4991-0DF3-471E-A4B9-DC3337D366ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E97E4991-0DF3-471E-A4B9-DC3337D366ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E97E4991-0DF3-471E-A4B9-DC3337D366ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E97E4991-0DF3-471E-A4B9-DC3337D366ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

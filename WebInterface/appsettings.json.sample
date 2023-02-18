@@ -1,0 +1,19 @@
+﻿{
+  "ConnectionStrings": {
+    "DefaultConnection": "DataSource=app.db;Cache=Shared"
+  },
+  "BotSettings": {
+    "Telegram": {
+      "General": {
+        "AccessToken": "<token provided by the Telegram BotFather>"
+      }
+    }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}
