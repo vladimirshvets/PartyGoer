@@ -15,6 +15,8 @@ public class TelegramChatBot : IChatBot
     /// </summary>
     public const string APP_ID = "telegram";
 
+    public event IChatBot.MessageReceivedEventHandler? MessageReceived;
+
     /// <summary>
     /// Bot access token.
     /// </summary>
@@ -34,8 +36,6 @@ public class TelegramChatBot : IChatBot
     /// Instance of logger.
     /// </summary>
     private Logger _logger;
-
-    public event EventHandler<BotMessageReceivedEventArgs>? MessageReceived;
 
     /// <summary>
     /// Telegram bot constructor.

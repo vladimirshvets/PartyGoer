@@ -1,14 +1,19 @@
-﻿namespace PartyGoer.ChatBot;
+﻿using System.Security.Principal;
+
+namespace PartyGoer.ChatBot;
 
 /// <summary>
 /// Chat bot interface.
 /// </summary>
 public interface IChatBot
 {
+    public delegate void MessageReceivedEventHandler(
+        IChatBot sender, BotMessageReceivedEventArgs e);
+
     /// <summary>
     /// Invoked when a message is received.
     /// </summary>
-    public event EventHandler<BotMessageReceivedEventArgs> MessageReceived;
+    public event MessageReceivedEventHandler? MessageReceived;
 
     /// <summary>
     /// Start listening to messages.

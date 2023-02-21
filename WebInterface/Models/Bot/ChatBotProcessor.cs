@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.Text.RegularExpressions;
-using System.Threading;
-using NLog;
+﻿using NLog;
 using PartyGoer.ChatBot;
-using PartyGoer.Infotainment;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using WebInterface.Data;
 
 namespace WebInterface.Models.Bot;
 
@@ -18,18 +12,20 @@ public class ChatBotProcessor
 
     //private NameValueCollection _foodStickers;
 
+    private readonly ApplicationDbContext _context;
+
     /// <summary>
     /// Instance of logger.
     /// </summary>
     private Logger _logger;
 
-    public ChatBotProcessor()
+    public ChatBotProcessor(ApplicationDbContext context)
     {
+        _context = context;
         _logger = LogManager.GetCurrentClassLogger();
 
         // Set stickers.
         // ToDo:
-        // Remove ConfigurationManager package.
         // Load a collection of stickers from database for specific chat.
         //_helloStickers =
         //    ConfigurationManager.GetSection("telegramBotSettings/stickers/hello")
@@ -63,8 +59,13 @@ public class ChatBotProcessor
         bot.StartBot(cts);
     }
 
+    /// <summary>
+    /// Handle received message.
+    /// </summary>
+    /// <param name="sender">Chat bot instance</param>
+    /// <param name="e">Event arguments</param>
     private void HandleReceivedMessage(
-        object sender, BotMessageReceivedEventArgs e)
+        IChatBot sender, BotMessageReceivedEventArgs e)
     {
         BotMessage message = e.BotMessage;
 
@@ -76,6 +77,41 @@ public class ChatBotProcessor
             $"| Message Id: {message.MessageId}" +
             $"| Message Text: {message.Text} " +
             $"| Received sticker: {message.Sticker}");
+
+        if (_context.Chat != null)
+        {
+            Chat? chat =
+                _context.Chat.FirstOrDefault(x => x.ChatId == message.ChatId);
+            if (chat == null)
+            {
+                // ToDo:
+                // Remove hardcoded values.
+                chat = new Chat()
+                {
+                    AppId = "telegram",
+                    ChatId = message.ChatId,
+                    Type = "private",
+                    Title = message.ChatTitle,
+                    FullName = message.UserFullname,
+                    IsAuthorized = true,
+                    IsBeingListened = true
+
+                };
+
+                _context.Chat.Add(chat);
+
+                try
+                {
+                    _context.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Debug(ex.Message);
+                }
+            }
+        }
+
+
 
         //if (false)
         //{

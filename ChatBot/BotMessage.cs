@@ -27,6 +27,22 @@ public class BotMessage
 
     public string? Sticker { get; set; }
 
+    public string? UserFullname
+    {
+        get
+        {
+            if (UserFirstname == null)
+            {
+                return UserLastname;
+            }
+            if (UserLastname == null)
+            {
+                return UserFirstname;
+            }
+            return $"{UserFirstname} {UserLastname}";
+        }
+    }
+
     public BotMessageType Type
     {
         get

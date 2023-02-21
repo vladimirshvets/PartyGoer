@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -47,7 +48,10 @@ Logger logger = LogManager.GetCurrentClassLogger();
 logger.Debug($"Starting up the web application...");
 
 // Create and start chat bot instance.
+var dbContextOptionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connectionString);
+ApplicationDbContext dbContext = new ApplicationDbContext(dbContextOptionsBuilder.Options);
+
 string tgAccessToken = builder.Configuration.GetValue<string>("BotSettings:Telegram:General:AccessToken") ?? throw new InvalidOperationException("Telegram API access token not found.");
-await new ChatBotProcessor().InitializeBot("telegram", tgAccessToken);
+await new ChatBotProcessor(dbContext).InitializeBot("telegram", tgAccessToken);
 
 app.Run();
