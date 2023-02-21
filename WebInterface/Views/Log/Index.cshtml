@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Execution Log";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Execution Log</h1>
+    <div>
+        <textarea style="width: 100%; height: 400px">
+            @foreach (string log in Model)
+            {
+                @(log + "\n")
+            }
+        </textarea>
+    </div>
+</div>

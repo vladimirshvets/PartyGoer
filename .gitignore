@@ -5,7 +5,7 @@
 
 App.config
 appsettings.json
-app.db
+app.db*
 
 # User-specific files
 *.rsuser

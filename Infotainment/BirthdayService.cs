@@ -87,7 +87,7 @@ public static class BirthdayService
     /// </summary>
     /// <param name="userName">User name</param>
     /// <returns>Generated congratulation phrase.</returns>
-    public static string GetCongratulation(string userName = null)
+    public static string GetCongratulation(string? userName = null)
     {
         Random random = new Random();
         int eventType = random.Next(eventTypes.Length);

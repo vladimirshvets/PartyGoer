@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NLog;
-using PartyGoer.ChatBot;
-using WebInterface;
 using WebInterface.Data;
+using WebInterface.Models.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,18 +43,11 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 // Create logger instance.
-LogManager.LoadConfiguration("..//..//..//nlog_web.config");
 Logger logger = LogManager.GetCurrentClassLogger();
-logger.Debug($"Starting up the web application");
+logger.Debug($"Starting up the web application...");
 
 // Create and start chat bot instance.
-string tgAccessToken = builder.Configuration.GetValue<string>(
-    "BotSettings:Telegram:General:AccessToken");
-ChatBotFactory botFactory = new ChatBotFactory();
-IChatBot tgBot = botFactory.GetChatBot("telegram", tgAccessToken);
-
-using CancellationTokenSource cts = new();
-tgBot.TestConnectionAsync(cts);
-tgBot.StartBot(cts);
+string tgAccessToken = builder.Configuration.GetValue<string>("BotSettings:Telegram:General:AccessToken") ?? throw new InvalidOperationException("Telegram API access token not found.");
+await new ChatBotProcessor().InitializeBot("telegram", tgAccessToken);
 
 app.Run();

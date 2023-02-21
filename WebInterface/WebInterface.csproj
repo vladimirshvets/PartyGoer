@@ -11,6 +11,12 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <ItemGroup>
     <None Remove="NLog" />
+    <None Remove="Views\Log\" />
+    <None Remove="Pages\" />
+    <None Remove="Pages\Chats\" />
+    <None Remove="Microsoft.VisualStudio.Web.CodeGeneration.Design" />
+    <None Remove="Microsoft.EntityFrameworkCore.SqlServer" />
+    <None Remove="Models\Bot\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
@@ -33,6 +39,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.3" />
     <PackageReference Include="NLog" Version="5.1.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,5 +50,11 @@
     <ProjectReference Include="..\TelegramChatBot\TelegramChatBot.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Views\Log\" />
+    <Folder Include="Pages\" />
+    <Folder Include="Pages\Chats\" />
+    <Folder Include="Models\Bot\" />
   </ItemGroup>
 </Project>

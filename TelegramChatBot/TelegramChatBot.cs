@@ -11,6 +11,11 @@ namespace PartyGoer.TelegramChatBot;
 public class TelegramChatBot : IChatBot
 {
     /// <summary>
+    /// Messaging app identifier.
+    /// </summary>
+    public const string APP_ID = "telegram";
+
+    /// <summary>
     /// Bot access token.
     /// </summary>
     private readonly string _accessToken;
@@ -26,17 +31,14 @@ public class TelegramChatBot : IChatBot
     private ReceiverOptions _receiverOptions;
 
     /// <summary>
-    /// Message processor.
-    /// </summary>
-    private TelegramMessageProcessor _messageProcessor;
-
-    /// <summary>
     /// Instance of logger.
     /// </summary>
     private Logger _logger;
 
+    public event EventHandler<BotMessageReceivedEventArgs>? MessageReceived;
+
     /// <summary>
-    /// Bot constructor.
+    /// Telegram bot constructor.
     /// </summary>
     /// <param name="accessToken">Bot access token.</param>
     public TelegramChatBot(string accessToken)
@@ -48,9 +50,28 @@ public class TelegramChatBot : IChatBot
             // Receive all update types.
             AllowedUpdates = Array.Empty<UpdateType>()
         };
-        _messageProcessor = new TelegramMessageProcessor();
-
         _logger = LogManager.GetCurrentClassLogger();
+    }
+
+    public void StartBot(CancellationTokenSource cts)
+    {
+        // StartReceiving does not block the caller thread.
+        // Receiving is done on the ThreadPool.
+        _client.StartReceiving(
+            updateHandler: HandleUpdateAsync,
+            pollingErrorHandler: HandlePollingErrorAsync,
+            receiverOptions: _receiverOptions,
+            cancellationToken: cts.Token
+        );
+
+        var me = _client.GetMeAsync();
+        _logger.Debug($"Start listening for @{me.Result.Username}");
+    }
+
+    public void StopBot(CancellationTokenSource cts)
+    {
+        // Send cancellation request to stop bot.
+        cts.Cancel();
     }
 
     public async Task TestConnectionAsync(CancellationTokenSource cts)
@@ -89,27 +110,6 @@ public class TelegramChatBot : IChatBot
             cancellationToken: cts.Token);
     }
 
-    public void StartBot(CancellationTokenSource cts)
-    {
-        // StartReceiving does not block the caller thread.
-        // Receiving is done on the ThreadPool.
-        _client.StartReceiving(
-            updateHandler: HandleUpdateAsync,
-            pollingErrorHandler: HandlePollingErrorAsync,
-            receiverOptions: _receiverOptions,
-            cancellationToken: cts.Token
-        );
-
-        var me = _client.GetMeAsync();
-        _logger.Debug($"Start listening for @{me.Result.Username}");
-    }
-
-    public void StopBot(CancellationTokenSource cts)
-    {
-        // Send cancellation request to stop bot.
-        cts.Cancel();
-    }
-
     /// <summary>
     /// Handle chat updates.
     /// </summary>
@@ -117,13 +117,36 @@ public class TelegramChatBot : IChatBot
     /// <param name="update">Chat update</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>true if the update has been processed successfully.</returns>
-    private async Task<bool> HandleUpdateAsync(
+    private async Task HandleUpdateAsync(
         ITelegramBotClient botClient,
         Update update,
         CancellationToken cancellationToken)
     {
-        return await _messageProcessor.ProcessAsync(
-            botClient, update, cancellationToken);
+        // Only process Message updates:
+        // https://core.telegram.org/bots/api#message
+        if (update.Message is not { } message)
+        {
+            return;
+        }
+
+        // Only process text messages.
+        if (message.Text is not { } messageText)
+        {
+            return;
+        }
+
+        _logger.Debug($"Chat {message.Chat.Id} " +
+            $"(title: {message.Chat.Title}) " +
+            $"From {message.From?.Id} {message.From?.Username} " +
+            $"/ {message.From?.FirstName} {message.From?.LastName} " +
+            $"| Message Id: {message.MessageId}" +
+            $"| Message Text: {messageText} " +
+            $"| Received sticker: {message.Sticker?.SetName}, " +
+            $"fileId = {message.Sticker?.FileId}");
+
+        BotMessage botMessage = new TelegramMessageMapper().Map(message);
+        var args = new BotMessageReceivedEventArgs(botMessage);
+        MessageReceived?.Invoke(this, args);
     }
 
     /// <summary>

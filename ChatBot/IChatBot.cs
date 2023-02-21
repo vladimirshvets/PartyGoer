@@ -6,6 +6,23 @@
 public interface IChatBot
 {
     /// <summary>
+    /// Invoked when a message is received.
+    /// </summary>
+    public event EventHandler<BotMessageReceivedEventArgs> MessageReceived;
+
+    /// <summary>
+    /// Start listening to messages.
+    /// </summary>
+    /// <param name="cts">Cancellation token source</param>
+    public void StartBot(CancellationTokenSource cts);
+
+    /// <summary>
+    /// Stop listening to messages.
+    /// </summary>
+    /// <param name="cts">Cancellation token source</param>
+    public void StopBot(CancellationTokenSource cts);
+
+    /// <summary>
     /// Checks the connection between application and bot.
     /// </summary>
     /// <param name="cts">Cancellation token source</param>
@@ -40,16 +57,4 @@ public interface IChatBot
         bool disableNotification,
         int? replyToMessageId,
         CancellationTokenSource cts);
-
-    /// <summary>
-    /// Start listening to messages.
-    /// </summary>
-    /// <param name="cts">Cancellation token source</param>
-    public void StartBot(CancellationTokenSource cts);
-
-    /// <summary>
-    /// Stop listening to messages.
-    /// </summary>
-    /// <param name="cts">Cancellation token source</param>
-    public void StopBot(CancellationTokenSource cts);
 }

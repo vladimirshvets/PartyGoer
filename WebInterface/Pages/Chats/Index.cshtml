@@ -1,0 +1,64 @@
+@page
+@model WebInterface.Pages.Chats.IndexModel
+
+@{
+    ViewData["Title"] = "Chats";
+}
+
+<h1>Chats</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Chat[0].AppId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Chat[0].ChatId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Chat[0].Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Chat[0].Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Chat[0].FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Chat[0].IsBeingListened)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Chat[0].IsAuthorized)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Chat) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AppId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ChatId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsBeingListened)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsAuthorized)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

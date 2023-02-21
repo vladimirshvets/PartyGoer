@@ -11,7 +11,7 @@ namespace ConsoleApp
 		/// <param name="botType">Bot type</param>
 		/// <param name="accessToken">Access token</param>
 		/// <returns>The instance of selected bot.</returns>
-		public IChatBot GetChatBot(
+		public IChatBot? GetChatBot(
 			string botType, string accessToken)
 		{
 			switch (botType)

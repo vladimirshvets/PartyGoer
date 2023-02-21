@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebInterface.Data;
 
@@ -10,9 +11,11 @@ using WebInterface.Data;
 namespace WebInterface.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230221112327_AddChatEntity")]
+    partial class AddChatEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.3");
@@ -215,7 +218,7 @@ namespace WebInterface.Data.Migrations
 
             modelBuilder.Entity("WebInterface.Models.Chat", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("ChatId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -223,7 +226,7 @@ namespace WebInterface.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<long>("ChatId")
+                    b.Property<int>("EntityId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("FullName")
@@ -242,7 +245,7 @@ namespace WebInterface.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("ChatId");
 
                     b.ToTable("Chat");
                 });
