@@ -1,8 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebInterface.Models;
 
+[Table("Chats")]
 public class Chat
 {
 	/// <summary>

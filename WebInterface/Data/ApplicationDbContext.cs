@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using WebInterface.Models;
 
 namespace WebInterface.Data;
 
@@ -12,4 +11,3 @@ public class ApplicationDbContext : IdentityDbContext
     }
     public DbSet<WebInterface.Models.Chat> Chat { get; set; } = default!;
 }
-

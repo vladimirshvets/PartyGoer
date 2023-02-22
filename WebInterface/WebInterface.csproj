@@ -17,6 +17,7 @@
     <None Remove="Microsoft.VisualStudio.Web.CodeGeneration.Design" />
     <None Remove="Microsoft.EntityFrameworkCore.SqlServer" />
     <None Remove="Models\Bot\" />
+    <None Remove="Data\Migrations\" />
   </ItemGroup>
   <ItemGroup>
     <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
@@ -56,5 +57,10 @@
     <Folder Include="Pages\" />
     <Folder Include="Pages\Chats\" />
     <Folder Include="Models\Bot\" />
+    <Folder Include="Data\Migrations\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Migrations\20230222113110_InitialCreate.cs" />
+    <Compile Remove="Migrations\20230222113110_InitialCreate.Designer.cs" />
   </ItemGroup>
 </Project>
