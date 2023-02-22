@@ -1,6 +1,7 @@
 ﻿using NLog;
 using PartyGoer.ChatBot;
 using WebInterface.Data;
+using WebInterface.Services;
 
 namespace WebInterface.Models.Bot;
 
@@ -14,14 +15,19 @@ public class ChatBotProcessor
 
     private readonly ApplicationDbContext _context;
 
+    private readonly ChatService _chatService;
+
     /// <summary>
     /// Instance of logger.
     /// </summary>
     private Logger _logger;
 
-    public ChatBotProcessor(ApplicationDbContext context)
+    public ChatBotProcessor(
+        ApplicationDbContext context,
+        ChatService chatService)
     {
         _context = context;
+        _chatService = chatService;
         _logger = LogManager.GetCurrentClassLogger();
 
         // Set stickers.
@@ -69,47 +75,45 @@ public class ChatBotProcessor
     {
         BotMessage message = e.BotMessage;
 
-        _logger.Debug("NEW MESSAGE RECEIVED");
-        _logger.Debug($"Chat {message.ChatId} " +
-            $"(title: {message.ChatTitle}) " +
-            $"From {message.UserId} {message.UserNickname} " +
-            $"/ {message.UserFirstname} {message.UserLastname} " +
-            $"| Message Id: {message.MessageId}" +
-            $"| Message Text: {message.Text} " +
-            $"| Received sticker: {message.Sticker}");
+        _logger.Debug("HANDLER: NEW MESSAGE RECEIVED");
+        //_logger.Debug($"Chat {message.ChatId} " +
+        //    $"(title: {message.ChatTitle}) " +
+        //    $"From {message.UserId} {message.UserNickname} " +
+        //    $"/ {message.UserFirstname} {message.UserLastname} " +
+        //    $"| Message Id: {message.MessageId}" +
+        //    $"| Message Text: {message.Text} " +
+        //    $"| Received sticker: {message.Sticker}");
 
-        if (_context.Chat != null)
+        Chat? chat =
+            _chatService.GetChatAsync("telegram", message.ChatId).Result;
+        if (chat == null)
         {
-            Chat? chat =
-                _context.Chat.FirstOrDefault(x => x.ChatId == message.ChatId);
-            if (chat == null)
+            // ToDo:
+            // Remove hardcoded values.
+            chat = new Chat()
             {
-                // ToDo:
-                // Remove hardcoded values.
-                chat = new Chat()
-                {
-                    AppId = "telegram",
-                    ChatId = message.ChatId,
-                    Type = "private",
-                    Title = message.ChatTitle,
-                    FullName = message.UserFullname,
-                    IsAuthorized = true,
-                    IsBeingListened = true
+                AppId = "telegram",
+                ChatId = message.ChatId,
+                Type = "private",
+                Title = message.ChatTitle,
+                FullName = message.UserFullname,
+                IsAuthorized = true,
+                IsBeingListened = true
 
-                };
+            };
 
-                _context.Chat.Add(chat);
+            _context.Chats.Add(chat);
 
-                try
-                {
-                    _context.SaveChangesAsync();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Debug(ex.Message);
-                }
+            try
+            {
+                _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Debug(ex.Message);
             }
         }
+
 
 
 

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NLog;
 using WebInterface.Data;
 using WebInterface.Models.Bot;
+using WebInterface.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,12 @@ var connectionString = builder.Configuration.GetConnectionString("MSSQLConnectio
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddTransient<ChatService>();
+builder.Services.AddStackExchangeRedisCache(options => {
+    options.Configuration = "localhost";
+    options.InstanceName = "chatinfo_";
+});
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -48,11 +55,10 @@ Logger logger = LogManager.GetCurrentClassLogger();
 logger.Debug($"Starting up the web application...");
 
 // Create and start chat bot instance.
-var dbContextOptionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>()
-    .UseSqlServer(connectionString);
-ApplicationDbContext dbContext = new ApplicationDbContext(dbContextOptionsBuilder.Options);
-
+var scope = app.Services.CreateScope();
+var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
+var chatService = scope.ServiceProvider.GetService<ChatService>();
 string tgAccessToken = builder.Configuration.GetValue<string>("BotSettings:Telegram:General:AccessToken") ?? throw new InvalidOperationException("Telegram API access token not found.");
-await new ChatBotProcessor(dbContext).InitializeBot("telegram", tgAccessToken);
+await new ChatBotProcessor(context, chatService).InitializeBot("telegram", tgAccessToken);
 
 app.Run();

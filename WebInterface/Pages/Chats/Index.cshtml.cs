@@ -23,9 +23,9 @@ namespace WebInterface.Pages.Chats
 
         public async Task OnGetAsync()
         {
-            if (_context.Chat != null)
+            if (_context.Chats != null)
             {
-                Chat = await _context.Chat.ToListAsync();
+                Chat = await _context.Chats.ToListAsync();
             }
         }
     }

@@ -9,5 +9,5 @@ public class ApplicationDbContext : IdentityDbContext
         : base(options)
     {
     }
-    public DbSet<WebInterface.Models.Chat> Chat { get; set; } = default!;
+    public DbSet<WebInterface.Models.Chat> Chats { get; set; } = default!;
 }

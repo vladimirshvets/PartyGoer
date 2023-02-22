@@ -169,7 +169,7 @@ public class TelegramChatBot : IChatBot
             _ => exception.ToString()
         };
 
-        _logger.Debug(errorMessage);
+        _logger.Fatal(errorMessage);
         return Task.CompletedTask;
     }
 }
