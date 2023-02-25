@@ -1,0 +1,24 @@
+﻿version: '3.8'
+
+volumes:
+  sql_data:
+
+services:
+  mssql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: 'YourStrong@Passw0rd'
+    ports:
+      - '1433:1433'
+    expose:
+      - '1433'
+    volumes:
+      - $HOME/pets/Volumes/PartyGoer:/var/opt/mssql
+#      - sql_data:/var/opt/mssql:ro
+
+  redis-stack:
+    image: redis/redis-stack:latest
+    ports:
+      - '6379:6379'
+      - '8001:8001'

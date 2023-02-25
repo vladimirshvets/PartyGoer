@@ -137,14 +137,15 @@ public class TelegramChatBot : IChatBot
 
         _logger.Debug($"Chat {message.Chat.Id} " +
             $"(title: {message.Chat.Title}) " +
-            $"From {message.From?.Id} {message.From?.Username} " +
+            $"| From {message.From?.Id} {message.From?.Username} " +
             $"/ {message.From?.FirstName} {message.From?.LastName} " +
-            $"| Message Id: {message.MessageId}" +
-            $"| Message Text: {messageText} " +
-            $"| Received sticker: {message.Sticker?.SetName}, " +
-            $"fileId = {message.Sticker?.FileId}");
+            $"| Message Id: {message.MessageId} " +
+            $"| Type: {message.Type} " +
+            $"| Text: {messageText} " +
+            $"| Sticker: {message.Sticker?.SetName} " +
+            $"(fileId = {message.Sticker?.FileId})");
 
-        BotMessage botMessage = new TelegramMessageMapper().Map(message);
+        BotMessage botMessage = new MessageMapper().Map(message);
         var args = new BotMessageReceivedEventArgs(botMessage);
         MessageReceived?.Invoke(this, args);
     }

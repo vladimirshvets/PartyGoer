@@ -1,55 +1,61 @@
-﻿using System.Text.Json;
-using Microsoft.Extensions.Caching.Distributed;
-using WebInterface.Data;
-using WebInterface.Models;
+﻿using PartyGoer.ChatBot;
+using WebInterface.Models.Settings;
 
 namespace WebInterface.Services;
 
-public class ChatService
+public class ChatService : IHostedService
 {
-    private readonly ApplicationDbContext _context;
+    /// <summary>
+    /// Bot configuration data
+    /// </summary>
+    private readonly BotConfiguration _botConfig;
 
-    private readonly CacheService _cacheService;
+    //private readonly IServiceProvider _serviceProvider;
+
+    private readonly ChatBotProcessor _processor;
 
     public ChatService(
-		ApplicationDbContext context, IDistributedCache cache)
-	{
-        _context = context;
-        _cacheService = new CacheService(cache);
-	}
-
-    public async Task<Chat?> GetChatAsync(string appId, long chatId)
+        BotConfiguration botConfig,
+        ChatBotProcessor chatBotProcessor)
     {
-        // ToDo:
-        // Store chat key as primary key?
-        string chatKey = $"{appId}_{chatId}";
-        Chat? chat = null;
+        _botConfig = botConfig;
+        //_serviceProvider = serviceProvider;
+        //_processor = new ChatBotProcessor(_serviceProvider);
+        _processor = chatBotProcessor;
+    }
 
-        // Try loading chat info from cache.
-        string? chatStringValue = await _cacheService.GetStringAsync(chatKey);
-
-        if (chatStringValue != null)
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        if (_botConfig.Enabled)
         {
-            chat = JsonSerializer.Deserialize<Chat>(chatStringValue);
+            InitializeBot(_botConfig.AppId, _botConfig.AccessToken);
         }
-        else
-        {
-            // Try loading chat info from database.
-            chat = _context.Chats.FirstOrDefault(x => x.ChatId == chatId);
-            if (chat != null)
-            {
-                // Save chat info to cache.
-                chatStringValue = JsonSerializer.Serialize(chat);
-                await _cacheService.SetStringAsync(
-                    chatKey,
-                    chatStringValue,
-                    new DistributedCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    });
-            }
-        }
+        return Task.CompletedTask;
+    }
 
-        return chat;
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Create and start a bot of specified type.
+    /// </summary>
+    /// <param name="botType"></param>
+    /// <param name="accessToken"></param>
+    /// <returns></returns>
+	private async Task InitializeBot(string botType, string accessToken)
+    {
+        ChatBotFactory botFactory = new ChatBotFactory();
+        IChatBot bot =
+            botFactory.GetChatBot(botType, accessToken) ??
+            throw new NullReferenceException(
+                $"Cannot instantiate a bot of specified type: {botType}");
+
+        using CancellationTokenSource cts = new();
+        await bot.TestConnectionAsync(cts);
+
+        bot.MessageReceived += _processor.HandleReceivedMessage;
+        bot.StartBot(cts);
     }
 }

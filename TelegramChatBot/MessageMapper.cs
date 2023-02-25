@@ -6,12 +6,13 @@ namespace PartyGoer.TelegramChatBot;
 /// <summary>
 /// Telegram message mapper.
 /// </summary>
-public class TelegramMessageMapper : IMessageMapper<Message>
+public class MessageMapper : IMessageMapper<Message>
 {
     public BotMessage Map(Message original)
     {
         return new BotMessage
         {
+            AppId = TelegramChatBot.APP_ID,
             MessageId = original.MessageId,
             UserId = original.From?.Id,
             UserNickname = original.From?.Username,

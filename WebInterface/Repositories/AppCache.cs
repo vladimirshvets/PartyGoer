@@ -2,17 +2,19 @@
 using NLog;
 using StackExchange.Redis;
 
-namespace WebInterface.Services;
+namespace WebInterface.Repositories;
 
-public class CacheService
+public class AppCache
 {
     private readonly IDistributedCache _cache;
 
     private readonly Logger _logger;
 
-    public CacheService(IDistributedCache cache)
+    public AppCache(IDistributedCache cache)
 	{
         _cache = cache;
+        // ToDo:
+        // Use DI.
         _logger = LogManager.GetCurrentClassLogger();
     }
 

@@ -5,6 +5,8 @@
 /// </summary>
 public class BotMessage
 {
+    public string AppId { get; set; }
+
     public long MessageId { get; set; }
 
     public long? UserId { get; set; }

@@ -1,12 +1,23 @@
 ﻿{
   "ConnectionStrings": {
-    "DefaultConnection": "DataSource=app.db;Cache=Shared"
+    "DefaultConnection": "DataSource=app.db;Cache=Shared",
+    "MSSQLConnection": "Server=127.0.0.1;Database=PartyGoer;User=SA;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
   },
   "BotSettings": {
     "Telegram": {
-      "General": {
-        "AccessToken": "<token provided by the Telegram BotFather>"
-      }
+      "AppId": "telegram",
+      "Enabled": true,
+      "AccessToken": "f@ke_telegr@m_t0ken"
+    },
+    "Discord": {
+      "AppId": "discord",
+      "Enabled": false,
+      "AccessToken": "f@ke_disc0rd_t0ken"
+    },
+    "Viber": {
+      "AppId": "viber",
+      "Enabled": false,
+      "AccessToken": "f@ke_v1ber_t0ken"
     }
   },
   "Logging": {

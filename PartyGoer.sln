@@ -12,15 +12,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2D74E41E-893C-4B75-BA12-BE281AF5DC59}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
-		WebInterface\bin\Debug\net7.0\execution_web.log = WebInterface\bin\Debug\net7.0\execution_web.log
-		ConsoleApp\bin\Debug\net7.0\execution_console.log = ConsoleApp\bin\Debug\net7.0\execution_console.log
 		.gitignore = .gitignore
 		notes.txt = notes.txt
+		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebInterface", "WebInterface\WebInterface.csproj", "{E97E4991-0DF3-471E-A4B9-DC3337D366ED}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{948999FF-F6D3-4012-801A-9162F8184E0B}"
+Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "ConsoleApp", "ConsoleApp\ConsoleApp.csproj", "{8B6FD782-B9FC-427B-A867-8E4A57C2D12A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,10 +43,10 @@ Global
 		{E97E4991-0DF3-471E-A4B9-DC3337D366ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E97E4991-0DF3-471E-A4B9-DC3337D366ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E97E4991-0DF3-471E-A4B9-DC3337D366ED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{948999FF-F6D3-4012-801A-9162F8184E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{948999FF-F6D3-4012-801A-9162F8184E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{948999FF-F6D3-4012-801A-9162F8184E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{948999FF-F6D3-4012-801A-9162F8184E0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B6FD782-B9FC-427B-A867-8E4A57C2D12A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B6FD782-B9FC-427B-A867-8E4A57C2D12A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B6FD782-B9FC-427B-A867-8E4A57C2D12A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B6FD782-B9FC-427B-A867-8E4A57C2D12A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,9 +1,12 @@
-﻿using NLog;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using NLog;
 using PartyGoer.ChatBot;
 using WebInterface.Data;
-using WebInterface.Services;
+using WebInterface.Models;
+using WebInterface.Repositories;
 
-namespace WebInterface.Models.Bot;
+namespace WebInterface.Services;
 
 public class ChatBotProcessor
 {
@@ -13,21 +16,19 @@ public class ChatBotProcessor
 
     //private NameValueCollection _foodStickers;
 
-    private readonly ApplicationDbContext _context;
-
-    private readonly ChatService _chatService;
+    private readonly ChatRepository _chatRepository;
 
     /// <summary>
     /// Instance of logger.
     /// </summary>
     private Logger _logger;
 
-    public ChatBotProcessor(
-        ApplicationDbContext context,
-        ChatService chatService)
+    public ChatBotProcessor(ChatRepository chatRepository)
     {
-        _context = context;
-        _chatService = chatService;
+        //var context = serviceProvider.GetService<ApplicationDbContext>();
+        //var cache = serviceProvider.GetService<AppCache>();
+        //_chatRepository = new ChatRepository(context, cache);
+        _chatRepository = chatRepository;
         _logger = LogManager.GetCurrentClassLogger();
 
         // Set stickers.
@@ -45,32 +46,11 @@ public class ChatBotProcessor
     }
 
     /// <summary>
-    /// Create and start a bot of specified type.
-    /// </summary>
-    /// <param name="botType"></param>
-    /// <param name="accessToken"></param>
-    /// <returns></returns>
-	public async Task InitializeBot(string botType, string accessToken)
-	{
-        ChatBotFactory botFactory = new ChatBotFactory();
-        IChatBot bot =
-            botFactory.GetChatBot(botType, accessToken) ??
-            throw new NullReferenceException(
-                $"Cannot instantiate a bot of specified type: {botType}");
-
-        using CancellationTokenSource cts = new();
-        await bot.TestConnectionAsync(cts);
-
-        bot.MessageReceived += HandleReceivedMessage;
-        bot.StartBot(cts);
-    }
-
-    /// <summary>
     /// Handle received message.
     /// </summary>
     /// <param name="sender">Chat bot instance</param>
     /// <param name="e">Event arguments</param>
-    private void HandleReceivedMessage(
+    public void HandleReceivedMessage(
         IChatBot sender, BotMessageReceivedEventArgs e)
     {
         BotMessage message = e.BotMessage;
@@ -85,14 +65,14 @@ public class ChatBotProcessor
         //    $"| Received sticker: {message.Sticker}");
 
         Chat? chat =
-            _chatService.GetChatAsync("telegram", message.ChatId).Result;
+            _chatRepository.GetChatAsync(message.AppId, message.ChatId).Result;
         if (chat == null)
         {
             // ToDo:
             // Remove hardcoded values.
             chat = new Chat()
             {
-                AppId = "telegram",
+                AppId = message.AppId,
                 ChatId = message.ChatId,
                 Type = "private",
                 Title = message.ChatTitle,
@@ -102,20 +82,8 @@ public class ChatBotProcessor
 
             };
 
-            _context.Chats.Add(chat);
-
-            try
-            {
-                _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.Debug(ex.Message);
-            }
+            _chatRepository.SaveChatAsync(chat);
         }
-
-
-
 
         //if (false)
         //{

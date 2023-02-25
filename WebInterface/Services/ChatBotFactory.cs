@@ -1,7 +1,7 @@
 ﻿using PartyGoer.ChatBot;
 using PartyGoer.TelegramChatBot;
 
-namespace WebInterface.Models.Bot;
+namespace WebInterface.Services;
 
 public class ChatBotFactory
 {
