@@ -1,21 +1,24 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
-using NLog;
 using StackExchange.Redis;
 
 namespace WebInterface.Repositories;
 
 public class AppCache
 {
+    /// <summary>
+    /// Distributed cache.
+    /// </summary>
     private readonly IDistributedCache _cache;
 
-    private readonly Logger _logger;
+    /// <summary>
+    /// Instance of logger.
+    /// </summary>
+    private readonly ILogger<AppCache> _logger;
 
-    public AppCache(IDistributedCache cache)
+    public AppCache(IDistributedCache cache, ILogger<AppCache> logger)
 	{
         _cache = cache;
-        // ToDo:
-        // Use DI.
-        _logger = LogManager.GetCurrentClassLogger();
+        _logger = logger;
     }
 
     public async Task<string?> GetStringAsync(string key)
@@ -24,9 +27,9 @@ public class AppCache
         {
             return await _cache.GetStringAsync(key);
         }
-        catch (RedisConnectionException e)
+        catch (RedisConnectionException ex)
         {
-            _logger.Warn($"Unable to connect to the Redis server(s).");
+            _logger.LogWarning(ex, "Unable to connect to the Redis server(s).");
         }
         return null;
     }
@@ -38,9 +41,9 @@ public class AppCache
         {
             await _cache.SetStringAsync(key, value, options);
         }
-        catch (RedisConnectionException e)
+        catch (RedisConnectionException ex)
         {
-            _logger.Warn($"Unable to connect to the Redis server(s).");
+            _logger.LogWarning(ex, "Unable to connect to the Redis server(s).");
         }
     }
 }

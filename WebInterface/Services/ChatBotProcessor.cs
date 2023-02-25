@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Distributed;
-using NLog;
-using PartyGoer.ChatBot;
-using WebInterface.Data;
+﻿using PartyGoer.ChatBot;
 using WebInterface.Models;
 using WebInterface.Repositories;
 
@@ -16,20 +12,14 @@ public class ChatBotProcessor
 
     //private NameValueCollection _foodStickers;
 
-    private readonly ChatRepository _chatRepository;
-
     /// <summary>
     /// Instance of logger.
     /// </summary>
-    private Logger _logger;
+    private ILogger<ChatBotProcessor> _logger;
 
-    public ChatBotProcessor(ChatRepository chatRepository)
+    public ChatBotProcessor(ILogger<ChatBotProcessor> logger)
     {
-        //var context = serviceProvider.GetService<ApplicationDbContext>();
-        //var cache = serviceProvider.GetService<AppCache>();
-        //_chatRepository = new ChatRepository(context, cache);
-        _chatRepository = chatRepository;
-        _logger = LogManager.GetCurrentClassLogger();
+        _logger = logger;
 
         // Set stickers.
         // ToDo:
@@ -45,45 +35,9 @@ public class ChatBotProcessor
         //    as NameValueCollection;
     }
 
-    /// <summary>
-    /// Handle received message.
-    /// </summary>
-    /// <param name="sender">Chat bot instance</param>
-    /// <param name="e">Event arguments</param>
-    public void HandleReceivedMessage(
-        IChatBot sender, BotMessageReceivedEventArgs e)
+    public void ProcessMessage(BotMessage message)
     {
-        BotMessage message = e.BotMessage;
-
-        _logger.Debug("HANDLER: NEW MESSAGE RECEIVED");
-        //_logger.Debug($"Chat {message.ChatId} " +
-        //    $"(title: {message.ChatTitle}) " +
-        //    $"From {message.UserId} {message.UserNickname} " +
-        //    $"/ {message.UserFirstname} {message.UserLastname} " +
-        //    $"| Message Id: {message.MessageId}" +
-        //    $"| Message Text: {message.Text} " +
-        //    $"| Received sticker: {message.Sticker}");
-
-        Chat? chat =
-            _chatRepository.GetChatAsync(message.AppId, message.ChatId).Result;
-        if (chat == null)
-        {
-            // ToDo:
-            // Remove hardcoded values.
-            chat = new Chat()
-            {
-                AppId = message.AppId,
-                ChatId = message.ChatId,
-                Type = "private",
-                Title = message.ChatTitle,
-                FullName = message.UserFullname,
-                IsAuthorized = true,
-                IsBeingListened = true
-
-            };
-
-            _chatRepository.SaveChatAsync(chat);
-        }
+        _logger.LogInformation("Parsing received message...");
 
         //if (false)
         //{

@@ -1,27 +1,44 @@
 ﻿using PartyGoer.ChatBot;
+using PartyGoer.ChatBotFactory;
+using WebInterface.Models;
 using WebInterface.Models.Settings;
+using WebInterface.Repositories;
 
 namespace WebInterface.Services;
 
 public class ChatService : IHostedService
 {
     /// <summary>
-    /// Bot configuration data
+    /// Bot configuration data.
     /// </summary>
     private readonly BotConfiguration _botConfig;
 
-    //private readonly IServiceProvider _serviceProvider;
+    //private readonly ChatBotProcessor _processor;
 
-    private readonly ChatBotProcessor _processor;
+    /// <summary>
+    /// Chat repository.
+    /// </summary>
+    private readonly ChatRepository _chatRepository;
+
+    /// <summary>
+    /// Service provider.
+    /// </summary>
+    private readonly IServiceProvider _serviceProvider;
+
+    private readonly ILogger<ChatService> _logger;
 
     public ChatService(
         BotConfiguration botConfig,
-        ChatBotProcessor chatBotProcessor)
+        //ChatBotProcessor chatBotProcessor,
+        ChatRepository chatRepository,
+        IServiceProvider serviceProvider,
+        ILogger<ChatService> logger)
     {
         _botConfig = botConfig;
-        //_serviceProvider = serviceProvider;
-        //_processor = new ChatBotProcessor(_serviceProvider);
-        _processor = chatBotProcessor;
+        //_processor = chatBotProcessor;
+        _chatRepository = chatRepository;
+        _serviceProvider = serviceProvider;
+        _logger = logger;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -46,7 +63,7 @@ public class ChatService : IHostedService
     /// <returns></returns>
 	private async Task InitializeBot(string botType, string accessToken)
     {
-        ChatBotFactory botFactory = new ChatBotFactory();
+        ChatBotFactory botFactory = new ChatBotFactory(_serviceProvider);
         IChatBot bot =
             botFactory.GetChatBot(botType, accessToken) ??
             throw new NullReferenceException(
@@ -55,7 +72,50 @@ public class ChatService : IHostedService
         using CancellationTokenSource cts = new();
         await bot.TestConnectionAsync(cts);
 
-        bot.MessageReceived += _processor.HandleReceivedMessage;
+        bot.MessageReceived += HandleReceivedMessage;
         bot.StartBot(cts);
+    }
+
+    /// <summary>
+    /// Handle received message.
+    /// </summary>
+    /// <param name="sender">Chat bot instance</param>
+    /// <param name="e">Event arguments</param>
+    private void HandleReceivedMessage(
+        IChatBot sender, BotMessageReceivedEventArgs e)
+    {
+        BotMessage message = e.BotMessage;
+
+        _logger.LogDebug("HANDLER: NEW MESSAGE RECEIVED");
+        //_logger.LogDebug($"Chat {message.ChatId} " +
+        //    $"(title: {message.ChatTitle}) " +
+        //    $"From {message.UserId} {message.UserNickname} " +
+        //    $"/ {message.UserFirstname} {message.UserLastname} " +
+        //    $"| Message Id: {message.MessageId}" +
+        //    $"| Message Text: {message.Text} " +
+        //    $"| Received sticker: {message.Sticker}");
+
+        Chat? chat =
+            _chatRepository.GetChatAsync(message.AppId, message.ChatId).Result;
+        if (chat == null)
+        {
+            // ToDo:
+            // Remove hardcoded values.
+            chat = new Chat()
+            {
+                AppId = message.AppId,
+                ChatId = message.ChatId,
+                Type = "private",
+                Title = message.ChatTitle,
+                FullName = message.UserFullname,
+                IsAuthorized = true,
+                IsBeingListened = true
+            };
+
+            _chatRepository.SaveChatAsync(chat);
+        }
+
+        // ToDo:
+        // Call message processor.
     }
 }

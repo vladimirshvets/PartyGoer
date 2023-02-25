@@ -1,17 +1,28 @@
-﻿using System.Configuration;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using NLog;
+using NLog.Web;
 using WebInterface.Data;
 using WebInterface.Models.Settings;
 using WebInterface.Repositories;
 using WebInterface.Services;
 
+var logger = NLog.LogManager
+    .Setup()
+    .LoadConfigurationFromAppSettings()
+    .GetCurrentClassLogger();
+logger.Debug("Web application init...");
+
 var builder = WebApplication.CreateBuilder(args);
 
+// Setup NLog for Dependency injection.
+builder.Logging.ClearProviders();
+builder.Host.UseNLog();
+
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("MSSQLConnection") ?? throw new InvalidOperationException("Connection string 'MSSQLConnection' not found.");
+var connectionString =
+    builder.Configuration.GetConnectionString("MSSQLConnection") ??
+    throw new InvalidOperationException("Connection string 'MSSQLConnection' not found.");
 
 // Add data storages.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -45,9 +56,12 @@ foreach (var bot in bots)
         builder.Services.AddHostedService<ChatService>(provider =>
         {
             var scope = provider.CreateScope();
-            var botProcessor =
-                scope.ServiceProvider.GetRequiredService<ChatBotProcessor>();
-            return new ChatService(bot, botProcessor);
+            var chatRepo =
+                scope.ServiceProvider.GetRequiredService<ChatRepository>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<ChatService>>();
+            // ToDo:
+            // get chatRepo and logger inside using service provider?
+            return new ChatService(bot, chatRepo, scope.ServiceProvider, logger);
         });
     }
 }
@@ -83,11 +97,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-// Create logger instance.
-// ToDo:
-// Use DI.
-Logger logger = LogManager.GetCurrentClassLogger();
-logger.Debug($"Starting up the web application...");
+logger.Debug($"Web application starts...");
 
 app.Run();
 

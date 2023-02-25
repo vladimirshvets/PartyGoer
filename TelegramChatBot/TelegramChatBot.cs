@@ -1,4 +1,4 @@
-﻿using NLog;
+﻿using Microsoft.Extensions.Logging;
 using PartyGoer.ChatBot;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -8,12 +8,17 @@ using Telegram.Bot.Types.Enums;
 
 namespace PartyGoer.TelegramChatBot;
 
+/// <summary>
+/// Implementation of Telegram chat bot.
+/// </summary>
 public class TelegramChatBot : IChatBot
 {
     /// <summary>
     /// Messaging app identifier.
     /// </summary>
     public const string APP_ID = "telegram";
+
+    public string GetAppId => APP_ID;
 
     public event IChatBot.MessageReceivedEventHandler? MessageReceived;
 
@@ -35,13 +40,15 @@ public class TelegramChatBot : IChatBot
     /// <summary>
     /// Instance of logger.
     /// </summary>
-    private Logger _logger;
+    private ILogger<TelegramChatBot>? _logger;
 
     /// <summary>
     /// Telegram bot constructor.
     /// </summary>
     /// <param name="accessToken">Bot access token.</param>
-    public TelegramChatBot(string accessToken)
+    /// <param name="logger">Instance of logger.</param>
+    public TelegramChatBot(
+        string accessToken, ILogger<TelegramChatBot>? logger = null)
     {
         _accessToken = accessToken;
         _client = new TelegramBotClient(_accessToken);
@@ -50,7 +57,7 @@ public class TelegramChatBot : IChatBot
             // Receive all update types.
             AllowedUpdates = Array.Empty<UpdateType>()
         };
-        _logger = LogManager.GetCurrentClassLogger();
+        _logger = logger;
     }
 
     public void StartBot(CancellationTokenSource cts)
@@ -65,7 +72,7 @@ public class TelegramChatBot : IChatBot
         );
 
         var me = _client.GetMeAsync();
-        _logger.Debug($"Start listening for @{me.Result.Username}");
+        _logger?.LogDebug($"Start listening for @{me.Result.Username}");
     }
 
     public void StopBot(CancellationTokenSource cts)
@@ -77,7 +84,7 @@ public class TelegramChatBot : IChatBot
     public async Task TestConnectionAsync(CancellationTokenSource cts)
     {
         var me = await _client.GetMeAsync();
-        _logger.Debug($"Test: User {me.Id}, name is {me.FirstName}.");
+        _logger?.LogDebug($"Test: User {me.Id}, name is {me.FirstName}.");
     }
 
     public async Task SendTextMessageAsync(
@@ -135,7 +142,7 @@ public class TelegramChatBot : IChatBot
             return;
         }
 
-        _logger.Debug($"Chat {message.Chat.Id} " +
+        _logger?.LogDebug($"Chat {message.Chat.Id} " +
             $"(title: {message.Chat.Title}) " +
             $"| From {message.From?.Id} {message.From?.Username} " +
             $"/ {message.From?.FirstName} {message.From?.LastName} " +
@@ -170,7 +177,7 @@ public class TelegramChatBot : IChatBot
             _ => exception.ToString()
         };
 
-        _logger.Fatal(errorMessage);
+        _logger?.LogCritical(errorMessage);
         return Task.CompletedTask;
     }
 }

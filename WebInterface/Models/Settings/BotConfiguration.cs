@@ -1,8 +1,8 @@
 ﻿using System;
 namespace WebInterface.Models.Settings
 {
-	public class BotConfiguration
-	{
+    public class BotConfiguration
+    {
         public string AppId { get; set; }
 
         public Boolean Enabled { get; set; }

@@ -7,14 +7,29 @@ namespace WebInterface.Repositories;
 
 public class ChatRepository
 {
+    /// <summary>
+    /// Database context.
+    /// </summary>
     private readonly ApplicationDbContext _context;
 
+    /// <summary>
+    /// Cache context.
+    /// </summary>
     private readonly AppCache _cache;
 
-    public ChatRepository(ApplicationDbContext context, AppCache cache)
+    /// <summary>
+    /// Instance of logger.
+    /// </summary>
+    private readonly ILogger<ChatRepository> _logger;
+
+    public ChatRepository(
+        ApplicationDbContext context,
+        AppCache cache,
+        ILogger<ChatRepository> logger)
     {
         _context = context;
         _cache = cache;
+        _logger = logger;
     }
 
     public async Task<Chat?> GetChatAsync(string appId, long chatId)
@@ -49,7 +64,7 @@ public class ChatRepository
         }
         catch (Exception ex)
         {
-            //_logger.Debug(ex.Message);
+            _logger.LogError(ex.Message);
             return null;
         }
         await SaveChatInfoToCacheAsync(chat);

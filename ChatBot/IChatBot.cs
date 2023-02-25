@@ -11,6 +11,11 @@ public interface IChatBot
         IChatBot sender, BotMessageReceivedEventArgs e);
 
     /// <summary>
+    /// Get messaging application identifier.
+    /// </summary>
+    public string GetAppId { get; }
+
+    /// <summary>
     /// Invoked when a message is received.
     /// </summary>
     public event MessageReceivedEventHandler? MessageReceived;
